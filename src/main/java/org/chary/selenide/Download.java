@@ -13,16 +13,18 @@ public class Download {
     // Format the date and time to a string
     String dateTimeString = dateFormat.format(date);
 
-   void getImage(String imageName, long duration, String url) {
+   boolean getImage(String imageName, long duration, String url) {
         String pngFileName;
 
         try {
             open(url);
             Thread.sleep(duration*1000);
             pngFileName = screenshot((imageName + dateTimeString));
+            return false;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            return true;
         }
-    }
+   }
 }
 
