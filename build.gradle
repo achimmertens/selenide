@@ -1,0 +1,63 @@
+plugins {
+  id "java"
+}
+
+defaultTasks 'clean', 'test'
+
+sourceSets {
+  main {
+    java {srcDir 'src'}
+    resources {srcDir 'src'}
+  }
+  test {
+    java {srcDir 'test'}
+    resources {srcDir 'test'}
+  }
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  testImplementation 'junit:junit:4.13.2'
+  testImplementation 'com.codeborne:selenide-junit4:6.12.3'
+  testImplementation('org.seleniumhq.selenium:selenium-safari-driver:4.8.1') { transitive = false }
+  testRuntimeOnly 'org.slf4j:slf4j-simple:2.0.7'
+}
+
+[compileJava, compileTestJava]*.options.collect {options -> options.encoding = 'UTF-8'}
+[compileJava, compileTestJava]*.options.collect {options -> options.debug = true}
+
+tasks.withType(Test).all { testTask ->
+  testTask.systemProperties = [
+    'file.encoding': 'UTF-8',
+    'BUILD_URL': System.getenv()['BUILD_URL']
+  ]
+  testTask.testLogging.showStandardStreams = true
+  testTask.exclude 'org/selenide/examples/google/classic_page_object/**/*'
+  testTask.outputs.upToDateWhen { false }
+}
+
+task chrome(type: Test) {
+  systemProperties['selenide.browser'] = 'chrome'
+  systemProperties['selenide.headless'] = 'true'
+}
+
+task firefox(type: Test) {
+  systemProperties['selenide.browser'] = 'firefox'
+  systemProperties['selenide.headless'] = 'true'
+}
+
+task ie(type: Test) {
+  systemProperties['selenide.browser'] = 'ie'
+}
+
+task edge(type: Test) {
+  systemProperties['selenide.browser'] = 'edge'
+}
+
+// You must enable the 'Allow Remote Automation' option in Safari's Develop menu to control Safari via WebDriver.
+task safari(type: Test) {
+  systemProperties['selenide.browser'] = 'safari'
+}
